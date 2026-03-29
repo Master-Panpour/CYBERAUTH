@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings
+from pydantic import Field
 from typing import List
+import json
 
 
 class Settings(BaseSettings):
@@ -7,28 +9,29 @@ class Settings(BaseSettings):
     PRODUCTION: bool = False          # set True in prod; hides docs, enforces HTTPS cookies
 
     # ── Database ──────────────────────────────────────
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/cyberauth"
+    # REQUIRED: Must be set in .env or environment variables
+    DATABASE_URL: str = Field(..., description="PostgreSQL connection URL")
 
     # ── JWT ───────────────────────────────────────────
-    # FIX: no valid default — startup guard in main.py rejects "CHANGE_ME" prefix
-    SECRET_KEY: str = "CHANGE_ME_to_64_random_bytes_from_secrets.token_hex(32)"
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    # REQUIRED: Generate with: python -c "import secrets; print(secrets.token_hex(32))"
+    SECRET_KEY: str = Field(..., description="JWT secret key (64 hex characters minimum)")
+    ALGORITHM: str = Field(..., description="JWT algorithm")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(..., description="Access token expiration time in minutes")
+    REFRESH_TOKEN_EXPIRE_DAYS: int = Field(..., description="Refresh token expiration time in days")
 
     # ── Google OAuth ──────────────────────────────────
-    GOOGLE_CLIENT_ID: str = ""
-    GOOGLE_CLIENT_SECRET: str = ""
-    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/auth/google/callback"
+    GOOGLE_CLIENT_ID: str = Field(default="", description="Google OAuth Client ID")
+    GOOGLE_CLIENT_SECRET: str = Field(default="", description="Google OAuth Client Secret")
+    GOOGLE_REDIRECT_URI: str = Field(..., description="Google OAuth Redirect URI")
 
     # ── GitHub OAuth ──────────────────────────────────
-    GITHUB_CLIENT_ID: str = ""
-    GITHUB_CLIENT_SECRET: str = ""
-    GITHUB_REDIRECT_URI: str = "http://localhost:8000/auth/github/callback"
+    GITHUB_CLIENT_ID: str = Field(default="", description="GitHub OAuth Client ID")
+    GITHUB_CLIENT_SECRET: str = Field(default="", description="GitHub OAuth Client Secret")
+    GITHUB_REDIRECT_URI: str = Field(..., description="GitHub OAuth Redirect URI")
 
     # ── CORS / Frontend ───────────────────────────────
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
-    FRONTEND_URL: str = "http://localhost:3000"
+    ALLOWED_ORIGINS: List[str] = Field(..., description="Allowed CORS origins")
+    FRONTEND_URL: str = Field(..., description="Frontend URL for redirects")
 
     class Config:
         env_file = ".env"

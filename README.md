@@ -17,6 +17,7 @@ Full-stack authentication service with a cyberpunk-themed React UI, FastAPI back
 
 ```
 auth-system/
+├── .env.example         ← Master template (copy to backend/.env and frontend/.env.local)
 ├── backend/
 │   ├── main.py          ← FastAPI app (all routes)
 │   ├── models.py        ← SQLAlchemy User model
@@ -24,14 +25,15 @@ auth-system/
 │   ├── database.py      ← Async DB engine + session
 │   ├── config.py        ← Settings via .env
 │   ├── requirements.txt
-│   └── .env.example     ← Copy to .env and fill in
+│   └── .env.example     ← Backend template (optional - use root .env.example)
 └── frontend/
     ├── src/
     │   ├── App.jsx      ← Main UI (login page + canvas)
     │   └── main.jsx
     ├── index.html
     ├── package.json
-    └── vite.config.js
+    ├── vite.config.js
+    └── .env.example     ← Frontend template (optional - use root .env.example)
 ```
 
 ---
@@ -51,13 +53,14 @@ cd backend
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env            # Then edit .env with your values
+cp ../.env.example .env         # Copy from root template, then edit with your values
 uvicorn main:app --reload --port 8000
 ```
 
 ### 3. Frontend
 ```bash
 cd frontend
+cp ../.env.example .env.local   # Copy from root template (frontend uses .env.local)
 npm install
 npm run dev                     # Runs on http://localhost:3000
 ```
