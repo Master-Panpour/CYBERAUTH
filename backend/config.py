@@ -33,6 +33,21 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: List[str] = Field(..., description="Allowed CORS origins")
     FRONTEND_URL: str = Field(..., description="Frontend URL for redirects")
 
+    # ── Email Configuration ───────────────────────────
+    # Optional: Leave empty to disable email verification
+    SMTP_SERVER: str = Field(default="", description="SMTP server hostname")
+    SMTP_PORT: int = Field(default=587, description="SMTP port (usually 587 for TLS)")
+    SMTP_USER: str = Field(default="", description="SMTP user/email")
+    SMTP_PASSWORD: str = Field(default="", description="SMTP password or app password")
+    SMTP_FROM_EMAIL: str = Field(default="noreply@cyberauth.app", description="From email address")
+    
+    # Email timeout settings
+    EMAIL_VERIFICATION_TIMEOUT_HOURS: int = Field(default=24, description="Email verification token timeout")
+    PASSWORD_RESET_TIMEOUT_HOURS: int = Field(default=1, description="Password reset token timeout")
+    
+    # Email rate limiting
+    MAX_EMAIL_PER_HOUR: int = Field(default=5, description="Max emails per user per hour")
+    
     class Config:
         env_file = ".env"
 

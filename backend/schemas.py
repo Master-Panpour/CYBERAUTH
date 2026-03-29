@@ -69,3 +69,78 @@ class TokenResponse(BaseModel):
     refresh_token: str
     token_type: str
     user: UserResponse
+
+
+# ── Email Verification Schemas ────────────────────────────────────────
+
+class VerifyEmailRequest(BaseModel):
+    """Request to verify email with token."""
+    token: str = Field(min_length=1, max_length=256)
+
+
+class VerifyEmailResponse(BaseModel):
+    """Response after email verification."""
+    message: str
+    email_verified: bool
+
+
+class RequestEmailVerificationRequest(BaseModel):
+    """Request to send verification email."""
+    email: EmailStr
+
+
+class RequestEmailVerificationResponse(BaseModel):
+    """Response after requesting verification email."""
+    message: str
+    email: str
+
+
+# ── Password Reset Schemas ────────────────────────────────────────────
+
+class RequestPasswordResetRequest(BaseModel):
+    """Request password reset email."""
+    email: EmailStr
+
+
+class RequestPasswordResetResponse(BaseModel):
+    """Response after requesting password reset."""
+    message: str
+
+
+class VerifyPasswordResetTokenRequest(BaseModel):
+    """Verify password reset token is valid."""
+    token: str = Field(min_length=1, max_length=256)
+
+
+class VerifyPasswordResetTokenResponse(BaseModel):
+    """Response after verifying token."""
+    valid: bool
+    message: str
+
+
+class ResetPasswordRequest(BaseModel):
+    """Reset password with token."""
+    token: str = Field(min_length=1, max_length=256)
+    new_password: str = Field(min_length=PASSWORD_MIN_LEN, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        """Validate password strength (same as registration)."""
+        if v.lower() in COMMON_PASSWORDS:
+            raise ValueError("Password is too common")
+        has_upper = any(c.isupper() for c in v)
+        has_lower = any(c.islower() for c in v)
+        has_digit = any(c.isdigit() for c in v)
+        has_special = bool(re.search(r"[!@#$%^&*(),.?\":{}|<>_\-]", v))
+        if not (has_upper and has_lower and has_digit and has_special):
+            raise ValueError(
+                "Password must contain uppercase, lowercase, a digit, and a special character"
+            )
+        return v
+
+
+class ResetPasswordResponse(BaseModel):
+    """Response after password reset."""
+    message: str
+    success: bool

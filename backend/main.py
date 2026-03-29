@@ -14,6 +14,7 @@ import models
 import schemas
 from config import settings
 from sqlalchemy import select
+from email_routes import router as email_router
 
 # ─── Security Headers Middleware ─────────────────────────────────────────────
 
@@ -99,6 +100,9 @@ app.add_middleware(
 )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+# Include email verification routes
+app.include_router(email_router)
 
 
 # ─── JWT Helpers ─────────────────────────────────────────────────────────────
